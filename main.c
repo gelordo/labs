@@ -3,7 +3,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-// GENERAL
+// General
 #define CONT { \
  clear_buffer();\
  SLEEP300;\
@@ -12,8 +12,8 @@
  system(CLEAR);\
 }
 
-////FOR WINDOWS////
-#include<windows.h>
+//// For Windows ////
+#include <windows.h>
 #define CLEAR "cls"
 #define SLEEP650 Sleep(650)
 #define SLEEP300 Sleep(300)
@@ -35,7 +35,7 @@ typedef struct Stack {
 } Stack;
 
 typedef struct String {
-    char val;
+    char* val;
     struct String* next;
 } String;
 
@@ -44,7 +44,7 @@ void options();
 void input(int* choice);
 String* snode();
 Node* createNode(void* data, DataType type, size_t size);
-void add(String* old_node, char a);
+void add(String* old_node, char* a);
 String* create_string(char* a);
 Stack* createStack(int cap);
 int isEmpty(Stack* stack);
@@ -59,14 +59,26 @@ String* create_string_input();
 void peek(Stack* stack);
 void freeStack(Stack* stack);
 
+// void readString(char buffer) {
+    // int length = sizeof(buffer)/sizeof(buffer[0]);
+    // for (int i=0; i < length - 1; i++){
+		// printf("%c", buffer[i]);
+// }
+
+void readString(char* buffer) {
+    printf("%s", buffer);
+}
+
+
+
 int stackDeclared = 0;
 
 int main() {
     print("Hard Task, Lab-5");
     SLEEP300;
-    print("Press Enter key continue.");
+    print("Press Enter key to continue.");
     getchar();
-    
+
     Stack* stack = NULL;
 
 Return:
@@ -94,9 +106,8 @@ Return:
             }
             break;
 
-        case 2: //push
+        case 2: // push
             system(CLEAR);
-			if (stack){
             print("Which data type will you push?");
             print("[1] Integer");
             print("[2] Float");
@@ -110,25 +121,30 @@ Return:
                 case 1:
                     print("Pushing Int");
                     int myInt;
-					scanf("%i", &myInt);
+                    scanf("%i", &myInt);
                     push(stack, &myInt, EINT);
                     break;
                 case 2:
                     print("Pushing float");
                     float myFloat;
-					scanf("%f", &myFloat);
+                    scanf("%f", &myFloat);
                     push(stack, &myFloat, EFLOAT);
                     break;
                 case 3:
                     print("Pushing double");
                     double myDouble;
-					scanf("%d", &myDouble);
+                    scanf("%lf", &myDouble);
                     push(stack, &myDouble, EDOUBLE);
                     break;
                 case 4:
                     print("Pushing string");
-                    String* myString = create_string_input();
-                    push(stack, myString, ESTRING);
+                    char sinput[300];
+                    fgets(sinput, sizeof(sinput), stdin);
+                    size_t len = strlen(sinput);
+                    if (len > 0 && sinput[len - 1] == '\n') {
+                        sinput[len - 1] = '\0';
+                    }
+                    push(stack, create_string(sinput), ESTRING);
                     break;
                 case 5:
                     print("Canceling...");
@@ -144,14 +160,9 @@ Return:
 
             CONT;
             break;
-			}
-			print("Stack not initialized");
-			CONT;
-			break;
 
-        case 3: //pop
+        case 3: // pop
             system(CLEAR);
-			if (stack){
             if (isEmpty(stack) == 0) {
                 print("Popping first element.");
                 pop(stack);
@@ -161,7 +172,7 @@ Return:
             CONT;
             break;
 
-        case 4: //peek
+        case 4: // peek
             system(CLEAR);
             if (stack) {
                 peek(stack);
@@ -170,11 +181,8 @@ Return:
                 print("Stack not initialized.");
             CONT;
             break;
-			}
-			print("Stack not initialized");
-			CONT;
-			break;
-        case 5: //check if empty
+
+        case 5: // check if empty
             system(CLEAR);
             if (stack) {
                 prints(isEmpty_text(stack));
@@ -184,7 +192,7 @@ Return:
             CONT;
             break;
 
-        case 6: //check if full
+        case 6: // check if full
             system(CLEAR);
             if (stack) {
                 prints(isFull_text(stack));
@@ -194,9 +202,8 @@ Return:
             CONT;
             break;
 
-        case 7: //free
+        case 7: // free
             system(CLEAR);
-			if (stack){
             if (isEmpty(stack) == 0) {
                 print("Freeing memory.");
                 freeStack(stack);
@@ -205,14 +212,10 @@ Return:
                 print("The stack is already empty");
             CONT;
             break;
-			}
-			print("Stack not initialized.");
-            CONT;
-            break;
 
-        case 8: //exit
+        case 8: // exit
+            getchar();
             print("Exiting program...");
-			SLEEP650;
             goto Exit;
         default:
             system(CLEAR);
@@ -223,10 +226,13 @@ Return:
     }
     goto Return;
 Exit:
+    print("Press Enter to confirm");
+    getchar();
     return 0;
 }
 
 void push(Stack* stack, void* value, DataType type) {
+
     if (isFull(stack) == 0) {
         Node* newNode = createNode(value, type, sizeof(value));
         newNode->next = stack->head;
@@ -238,29 +244,40 @@ void push(Stack* stack, void* value, DataType type) {
 }
 
 void peek(Stack* stack) {
-	if (stack){
-		if (isEmpty(stack)) {
-			print("The stack is empty");
-			return;
-		}
-	
-    switch (stack->head->type) {
-        case EINT:
-            print("%i", *(int*)(stack->head->value));
-            break;
-        case EFLOAT:
-            print("%f", *(float*)(stack->head->value));
-            break;
-        case EDOUBLE:
-            print("%f", *(double*)(stack->head->value));
-            break;
-        case ESTRING:
-            prints((stack->head->value));
-            break;
+    if (stack && stack->head) {
+        switch (stack->head->type) {
+            case EINT:
+                print("%i", *(int*)(stack->head->value));
+                break;
+            case EFLOAT:
+                print("%f", *(float*)(stack->head->value));
+                break;
+            case EDOUBLE:
+                print("%lf", *(double*)(stack->head->value));
+                break;
+            case ESTRING:
+                readString((char*)(stack->head->value));
+                break;
+        }
+    } else {
+        print("Stack is NULL or empty");
     }
-	}
-	print("Stack is NULL");
-	return;
+}
+
+void freeStack(Stack* stack) {
+    while (stack->head) {
+        Node* temp = stack->head;
+        stack->head = stack->head->next;
+        if (temp->type == ESTRING) {
+            free(((String*)temp->value)->val); // Free the string data
+            free(temp->value); // Free the String structure
+        }
+        else {
+            free(temp->value);
+        }
+        free(temp);
+    }
+    stackDeclared = 0;
 }
 
 void* pop(Stack* stack) {
@@ -272,6 +289,13 @@ void* pop(Stack* stack) {
     Node* temp = stack->head;
     stack->head = temp->next;
     void* value = temp->value;
+    if (temp->type == ESTRING) {
+        free(((String*)temp->value)->val); // Free the string data
+        free(temp->value); // Free the String structure
+    }
+    else {
+        free(temp->value);
+    }
     free(temp);
     stack->size--;
     return value;
@@ -316,7 +340,7 @@ String* isFull_text(Stack* stack) {
 
 void prints(String* string) {
     while (string != NULL) {
-        printf("%c", string->val);
+        printf("%s", string->val);
         string = string->next;
     }
     printf("\n");
@@ -332,28 +356,23 @@ void print(const char* str, ...) {
 
 String* snode() {
     String* string = (String*)malloc(sizeof(String));
-    string->val = '\0';
+    string->val = NULL;
     string->next = NULL;
     return string;
 }
 
-void add(String* old_node, char a) {
+void add(String* old_node, char* a) {
     String* new_node = snode();
-    new_node->val = a;
+    new_node->val = strdup(a);
     while (old_node->next) {
         old_node = old_node->next;
     }
     old_node->next = new_node;
 }
 
-
 String* create_string(char* a) {
     String* string = snode();
-    int i = 0;
-    while (a[i] != '\0') {
-        add(string, a[i]);
-        i++;
-    }
+    add(string, a);
     return string;
 }
 
@@ -395,7 +414,7 @@ String* create_string_input() {
     if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
         int i = 0;
         while (buffer[i] != '\0' && buffer[i] != '\n') {
-            add(string, buffer[i]);
+            add(string, &buffer[i]);
             i++;
         }
     } else {
@@ -403,14 +422,4 @@ String* create_string_input() {
     }
 
     return string;
-}
-
-void freeStack(Stack* stack) {
-    while (stack->head) {
-        Node* temp = stack->head;
-        stack->head = stack->head->next;
-        free(temp->value);
-        free(temp);
-    }
-	stackDeclared = 0;
 }
