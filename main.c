@@ -139,18 +139,19 @@ Return:
                 case 4:
                     print("Pushing string");
                     char sinput[300];
-                    fgets(sinput, sizeof(sinput), stdin);
+                    getchar();
+					fgets(sinput, sizeof(sinput), stdin);
                     size_t len = strlen(sinput);
                     if (len > 0 && sinput[len - 1] == '\n') {
                         sinput[len - 1] = '\0';
                     }
-                    push(stack, create_string(sinput), ESTRING);
+                    push(stack, sinput, ESTRING);
                     break;
                 case 5:
                     print("Canceling...");
                     SLEEP650;
                     break;
-                default:
+                /* default: */
                     system(CLEAR);
                     print("Invalid input. Please enter a valid number.");
                     clear_buffer();
@@ -256,7 +257,7 @@ void peek(Stack* stack) {
                 print("%lf", *(double*)(stack->head->value));
                 break;
             case ESTRING:
-                readString((char*)(stack->head->value));
+                print("%s",(char*)(stack->head->value));
                 break;
         }
     } else {
