@@ -163,18 +163,18 @@ Return:
 
         case 3: // pop
             system(CLEAR);
-            if (isEmpty(stack) == 0) {
+            if (isEmpty(stack) == 0 && stackDeclared == 1) {
                 print("Popping first element.");
                 pop(stack);
             }
             else
-                print("The stack is already empty");
+                print("The stack is empty");
             CONT;
             break;
 
         case 4: // peek
             system(CLEAR);
-            if (stack) {
+            if (stack && stackDeclared == 1) {
                 peek(stack);
             }
             else
@@ -184,7 +184,7 @@ Return:
 
         case 5: // check if empty
             system(CLEAR);
-            if (stack) {
+            if (stack && stackDeclared == 1) {
                 prints(isEmpty_text(stack));
             }
             else
@@ -194,7 +194,7 @@ Return:
 
         case 6: // check if full
             system(CLEAR);
-            if (stack) {
+            if (stack && stackDeclared == 1) {
                 prints(isFull_text(stack));
             }
             else
