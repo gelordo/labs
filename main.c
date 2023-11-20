@@ -19,7 +19,7 @@
 #define SLEEP300 Sleep(300)
 
 typedef enum {
-    EINT, EFLOAT, EDOUBLE, ESTRING
+    EINT, EFLOAT, ESTRING
 } DataType;
 
 typedef struct Node {
@@ -95,10 +95,13 @@ Return:
                 printf("Choose stack capacity (integer): ");
                 int n;
                 input(&n);
+				if (n > 0){
                 stack = createStack(n);
                 print("Initializing a stack with %i elements", n);
                 stackDeclared = 1;
-                CONT;
+				} else 
+				{print("Stack size can't 0 or lower");
+                CONT;}
             }
             else {
                 print("Already initialized, skipping...");
@@ -111,9 +114,8 @@ Return:
             print("Which data type will you push?");
             print("[1] Integer");
             print("[2] Float");
-            print("[3] Double");
-            print("[4] String");
-            print("[5] Cancel");
+            print("[3] String");
+            print("[4] Cancel");
 
             int pushc;
             input(&pushc);
@@ -122,21 +124,18 @@ Return:
                     print("Pushing Int");
                     int myInt;
                     scanf("%i", &myInt);
-                    push(stack, &myInt, EINT);
+					if (scanf( "%d", &myInt) == 1){
+                    push(stack, &myInt, EINT);}
+					else print("Not integer");
                     break;
                 case 2:
                     print("Pushing float");
                     float myFloat;
-                    scanf("%f", &myFloat);
-                    push(stack, &myFloat, EFLOAT);
+					if (scanf("%f", &myFloat) == 1){
+                    push(stack, &myFloat, EFLOAT);}
+					else print("Not a float");
                     break;
                 case 3:
-                    print("Pushing double");
-                    double myDouble;
-                    scanf("%lf", &myDouble);
-                    push(stack, &myDouble, EDOUBLE);
-                    break;
-                case 4:
                     print("Pushing string");
                     char sinput[300];
                     getchar();
@@ -147,7 +146,7 @@ Return:
                     }
                     push(stack, sinput, ESTRING);
                     break;
-                case 5:
+                case 4:
                     print("Canceling...");
                     SLEEP650;
                     break;
@@ -252,9 +251,6 @@ void peek(Stack* stack) {
                 break;
             case EFLOAT:
                 print("%f", *(float*)(stack->head->value));
-                break;
-            case EDOUBLE:
-                print("%lf", *(double*)(stack->head->value));
                 break;
             case ESTRING:
                 print("%s",(char*)(stack->head->value));
